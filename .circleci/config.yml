@@ -8,12 +8,21 @@ jobs:
       PLATFORM: x86_64
     steps:
       - checkout
-      - run: sudo service docker stop
-      - run: curl -fsSL https://get.docker.com/ | sudo sh
-      - run: |
-          mkdir -p ~/.docker
-          echo '{ "experimental": "enabled" }' > ~/.docker/config.json
-      - run: docker build --tag cross-platform-test --platform $PLATFORM .
+      - run:
+          name: Stop the Docker daemon
+          command: sudo service docker stop
+      - run:
+          name: Set up experimental Docker features
+          command: |
+            mkdir -p ~/.docker
+            echo '{ "experimental": "enabled" }' > ~/.docker/config.json
+            echo '{ "experimental": "enabled" }' > /etc/docker/daemon.json
+      - run:
+          name: Install the latest version of Docker
+          command: curl -fsSL https://get.docker.com/ | sudo sh
+      - run:
+          name: Build the Docker image
+          command: docker build --tag cross-platform-test --platform $PLATFORM .
 
   build-x86_64:
     <<: *defaults
