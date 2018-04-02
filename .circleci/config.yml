@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build-default: &defaults
+    working_directory: ~/src
+    machine:
+      image: circleci/classic:201711-01
+    environment:
+      PLATFORM: x86_64
+    steps:
+      - checkout
+      - run: sudo service docker stop
+      - run: curl -fsSL https://get.docker.com/ | sudo sh
+      - run: |
+          mkdir -p ~/.docker
+          echo '{ "experimental": "enabled" }' > ~/.docker/config.json
+      - run: docker build -t cross-platform-test --platform $PLATFORM
+
+  build-x86_64:
+    <<: *defaults
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-x86_64
