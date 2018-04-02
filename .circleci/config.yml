@@ -16,7 +16,7 @@ jobs:
           command: |
             mkdir -p ~/.docker
             echo '{ "experimental": "enabled" }' > ~/.docker/config.json
-            echo '{ "experimental": "enabled" }' > /etc/docker/daemon.json
+            sudo echo '{ "experimental": "enabled" }' > /etc/docker/daemon.json
       - run:
           name: Install the latest version of Docker
           command: curl -fsSL https://get.docker.com/ | sudo sh
