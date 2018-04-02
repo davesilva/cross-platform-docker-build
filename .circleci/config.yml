@@ -13,7 +13,7 @@ jobs:
       - run: |
           mkdir -p ~/.docker
           echo '{ "experimental": "enabled" }' > ~/.docker/config.json
-      - run: docker build -t cross-platform-test --platform $PLATFORM
+      - run: docker build --tag cross-platform-test --platform $PLATFORM .
 
   build-x86_64:
     <<: *defaults
