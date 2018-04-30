@@ -1,0 +1,10 @@
+before_script:
+  - mkdir -p ~/.docker
+  - echo '{ "experimental": "enabled" }' | tee ~/.docker/config.json
+  - echo '{ "experimental": true }' | sudo tee /etc/docker/daemon.json
+  - curl -fsSL https://get.docker.com/ | sudo sh
+
+build:
+  script:
+    - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+    - bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
