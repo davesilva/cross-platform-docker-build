@@ -1,16 +1,5 @@
-image: davesilva/docker-experimental
-
-services:
-  - docker:dind
-
-variables:
-  DOCKER_DRIVER: overlay
-
-build:
-  tags:
-    - docker
+build-image:
+  stage: build
   script:
     - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-    - ls .
-    - ls ./bin
     - ./bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
