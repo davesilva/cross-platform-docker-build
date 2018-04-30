@@ -12,4 +12,4 @@ build:
   script:
     - ls .
     - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-    - /bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
+    - bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
