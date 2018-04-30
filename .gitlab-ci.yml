@@ -1,5 +1,18 @@
-build-image:
+image: davesilva/docker-experimental
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+
+before_script:
+  - docker run --rm --privileged vicamo/binfmt-qemu:latest
+
+build:
   stage: build
+  tags:
+    - docker
   script:
     - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
     - ./bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
