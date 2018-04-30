@@ -1,0 +1,31 @@
+#!/bin/bash
+
+DOCKER_BUILD_PATH=$1
+DOCKER_TAG=$(echo $2 | grep : || echo $2:latest)
+DOCKERFILE=${3:-$1/Dockerfile}
+
+BASE_IMAGE_WITH_TAG=$(cat $DOCKERFILE | grep FROM | head -n 1 | sed -E 's/^FROM (.*)$/\1/')
+BASE_IMAGE=$(echo $BASE_IMAGE_WITH_TAG | sed -E 's/^([^:]+).*$/\1/')
+BASE_TAG=$(echo $BASE_IMAGE_WITH_TAG | sed -E 's/^[^:+]+:?(.*)$/\1/')
+BASE_TAG=${BASE_TAG:-latest}
+
+docker manifest inspect $BASE_IMAGE:$BASE_TAG \
+    | jq '.manifests | map(select(.platform.architecture != "s390x" and .platform.os != "windows")) | map({ digest: .digest, opts: "--arch \(.platform.architecture) --os \(.platform.os)\(if .platform.variant then " --variant \(.platform.variant)" else "" end)", tag: "\(.platform.os)-\(.platform.architecture)\(if .platform.variant then "-\(.platform.variant)" else "" end)" })' \
+     > /tmp/$BASE_IMAGE.json
+
+cat /tmp/$BASE_IMAGE.json \
+    | jq --raw-output \
+         --arg DOCKERFILE $DOCKERFILE \
+         --arg DOCKER_BUILD_PATH $DOCKER_BUILD_PATH \
+         --arg DOCKER_TAG $DOCKER_TAG \
+         --arg BASE_IMAGE $BASE_IMAGE \
+         '.[] | "cat \($DOCKERFILE) | sed \"s/^FROM.*\\$/FROM \($BASE_IMAGE)@\(.digest)/g\" | docker build \($DOCKER_BUILD_PATH) --file - --tag \($DOCKER_TAG)-\(.tag)"' \
+    | parallel
+
+cat /tmp/$BASE_IMAGE.json \
+    | jq --raw-output \
+         --arg DOCKER_TAG $DOCKER_TAG \
+         '.[] | "docker push \($DOCKER_TAG)-\(.tag) && docker manifest create --amend \($DOCKER_TAG) \($DOCKER_TAG)-\(.tag) && docker manifest annotate \(.opts) \($DOCKER_TAG) \($DOCKER_TAG)-\(.tag)"' \
+    | parallel
+
+docker manifest push $DOCKER_TAG
