@@ -20,7 +20,7 @@ jobs:
           command: curl -fsSL https://get.docker.com/ | sudo sh
       - run:
           name: Sign in to Docker Hub
-          command: docker -u $DOCKER_USER -p $DOCKER_PASS
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run:
           name: Build and push the Docker image
           command: bin/build . davesilva/cross-platform-build-test:$CIRCLE_SHA1
