@@ -1,16 +1,10 @@
-image: docker:latest
+image: davesilva/docker-experimental
 
 services:
   - docker:dind
 
 variables:
   DOCKER_DRIVER: overlay
-
-before_script:
-  - mkdir -p ~/.docker
-  - "echo '{ \"experimental\": \"enabled\" }' | tee ~/.docker/config.json"
-  - "echo '{ \"experimental\": true }' | tee /etc/docker/daemon.json"
-  - curl -fsSL https://get.docker.com/ | sh
 
 build:
   tags:
