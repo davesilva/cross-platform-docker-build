@@ -1,7 +1,7 @@
 before_script:
   - mkdir -p ~/.docker
-  - echo '{ "experimental": "enabled" }' | tee ~/.docker/config.json
-  - echo '{ "experimental": true }' | sudo tee /etc/docker/daemon.json
+  - "echo '{ \"experimental\": \"enabled\" }' | tee ~/.docker/config.json"
+  - "echo '{ \"experimental\": true }' | sudo tee /etc/docker/daemon.json"
   - curl -fsSL https://get.docker.com/ | sudo sh
 
 build:
