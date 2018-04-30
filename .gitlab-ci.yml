@@ -1,10 +1,20 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+
 before_script:
   - mkdir -p ~/.docker
   - "echo '{ \"experimental\": \"enabled\" }' | tee ~/.docker/config.json"
-  - "echo '{ \"experimental\": true }' | sudo tee /etc/docker/daemon.json"
-  - curl -fsSL https://get.docker.com/ | sudo sh
+  - "echo '{ \"experimental\": true }' | tee /etc/docker/daemon.json"
+  - curl -fsSL https://get.docker.com/ | sh
 
 build:
+  tags:
+    - docker
   script:
     - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
     - bin/build . davesilva/cross-platform-build-test:$CI_COMMIT_SHA
